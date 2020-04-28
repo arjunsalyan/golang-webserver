@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"html/template"
 	"net/http"
 	"strings"
 )
@@ -37,7 +39,38 @@ func dynamicViewHandler(w http.ResponseWriter, r *http.Request) {
 
 	p := &Page{Title: strings.Join(title, " "), Body: strings.Join(body, " ")}
 	renderTemplate(w, "templates/dynamic", p)
+}
 
+func listViewHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		fmt.Println("Here")
+		err := r.ParseForm()
+		if err != nil {
+			basicHTTPRender(w, "Failed to add the element")
+			return
+		}
+		ele := r.FormValue("list_object")
+		isAdded := inserElement(ele)
+		if !isAdded {
+			basicHTTPRender(w, "Failed")
+			return
+		}
+	}
+
+	elements, err := getAllElements()
+	if err != nil {
+		basicHTTPRender(w, "Error reading from database")
+		return
+	}
+	t, err := template.ParseFiles("templates/list.html")
+	if err != nil {
+		basicHTTPRender(w, "Failed to parse the template.")
+	}
+	p := &Page{Title: "List View", Elements: elements}
+	err = t.Execute(w, p)
+	if err != nil {
+		basicHTTPRender(w, "Failed to parse the template.")
+	}
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {

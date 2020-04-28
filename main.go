@@ -10,8 +10,9 @@ import (
 
 // Page is structure that defines a page
 type Page struct {
-	Title string
-	Body  string
+	Title    string
+	Body     string
+	Elements []Element
 }
 
 func basicHTTPRender(w http.ResponseWriter, message string) {
@@ -37,9 +38,11 @@ func loadPageFromFile(title string) (*Page, error) {
 }
 
 func main() {
+	// Create the database connection string
 	http.HandleFunc("404", notFoundHandler)
 	http.HandleFunc("/read-file/", fileReadHandler)
 	http.HandleFunc("/view/", dynamicViewHandler)
+	http.HandleFunc("/list/", listViewHandler)
 	http.HandleFunc("/", homeViewHandler)
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
