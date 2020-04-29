@@ -10,6 +10,7 @@ func main() {
 	// Create the database connection string
 	http.HandleFunc("404", handlers.NotFoundHandler)
 	http.HandleFunc("/read-file/", handlers.FileReadHandler)
+	http.HandleFunc("/books/", handlers.BooksViewHandler)
 	http.HandleFunc("/get-params/", handlers.GetParamsViewHandler)
 	http.HandleFunc("/elements/", handlers.ElementsViewHandler)
 	http.HandleFunc("/", handlers.HomeViewHandler)

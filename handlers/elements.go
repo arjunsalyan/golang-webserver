@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"html/template"
 	"learning_project/postgres"
 	"learning_project/templates"
 	"net/http"
@@ -29,13 +28,5 @@ func ElementsViewHandler(w http.ResponseWriter, r *http.Request) {
 		templates.BasicHTTPRender(w, "Error reading from database")
 		return
 	}
-	t, err := template.ParseFiles("templates/list.html")
-	if err != nil {
-		templates.BasicHTTPRender(w, "Failed to parse the template.")
-	}
-	p := &templates.Page{Title: "List View", Elements: elements}
-	err = t.Execute(w, p)
-	if err != nil {
-		templates.BasicHTTPRender(w, "Failed to parse the template.")
-	}
+	templates.RenderTemplate(w, "elements", &templates.Page{Title: "Elements View", Elements: elements})
 }

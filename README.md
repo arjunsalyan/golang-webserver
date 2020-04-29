@@ -1,6 +1,6 @@
 ## INTRODUCTION
 
-This is a basic project based which was implemented as a part of learning some introductory concepts of Golang.
+This is a basic project which was implemented as a part of learning some introductory concepts of Golang.
 
 *The project might evolve over time as more and more concepts are learned and attempts to implement those concepts in this project are made. The definition of the Project may eveolve over time which might not just be limited to a web server.*
 
