@@ -1,6 +1,9 @@
 package postgres
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+)
 
 // Book declares the schema for the table "books"
 type Book struct {
@@ -42,4 +45,14 @@ func GetAllBooks() ([]Book, error) {
 	}
 	defer db.Close()
 	return books, err
+}
+
+// Add a single book object to the database
+func (b Book) insertRow(db *sql.DB) bool {
+	insertStatement := `INSERT INTO books (name, author, pages) VALUES ($1, $2, $3)`
+	_, err := db.Exec(insertStatement, b.Name, b.Author, b.Pages)
+	if err != nil {
+		return false
+	}
+	return true
 }

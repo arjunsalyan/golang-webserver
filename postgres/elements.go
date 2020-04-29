@@ -1,6 +1,9 @@
 package postgres
 
-import "fmt"
+import (
+	"database/sql"
+	"fmt"
+)
 
 // Element declares the schema for the table "elements"
 type Element struct {
@@ -36,4 +39,14 @@ func GetAllElements() ([]Element, error) {
 	}
 	defer db.Close()
 	return elements, err
+}
+
+// Add a single Element object to the database
+func (e Element) insertRow(db *sql.DB) bool {
+	insertStatement := `INSERT INTO elements ( element ) VALUES ($1)`
+	_, err := db.Exec(insertStatement, e.Text)
+	if err != nil {
+		return false
+	}
+	return true
 }
