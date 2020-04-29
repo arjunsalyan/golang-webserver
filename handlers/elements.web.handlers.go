@@ -28,5 +28,5 @@ func ElementsViewHandler(w http.ResponseWriter, r *http.Request) {
 		templates.BasicHTTPRender(w, "Error reading from database")
 		return
 	}
-	templates.RenderTemplate(w, "elements", &templates.Page{Title: "Elements View", Elements: elements})
+	templates.RenderTemplate(w, "templates/elements", &templates.Page{Title: "Elements View", Elements: elements})
 }

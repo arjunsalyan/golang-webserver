@@ -2,15 +2,16 @@ package postgres
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
 // Book declares the schema for the table "books"
 type Book struct {
-	ID     int
-	Name   string
-	Author string
-	Pages  int
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	Author string `json:"author"`
+	Pages  int    `json:"pages"`
 }
 
 // GetAllBooks fetches all rows from the "books" table and returns a
@@ -45,6 +46,31 @@ func GetAllBooks() ([]Book, error) {
 	}
 	defer db.Close()
 	return books, err
+}
+
+func GetOneBook(id int) (Book, error) {
+	var (
+		name   string
+		author string
+		pages  int
+	)
+	sqlStatement := `SELECT * FROM books WHERE id=$1`
+	db := openDBConnection()
+	row := db.QueryRow(sqlStatement, id)
+	switch err := row.Scan(&id, &name, &author, &pages); err {
+	case sql.ErrNoRows:
+		return Book{}, errors.New("book does not exist")
+	case nil:
+		obj := Book{
+			ID:     id,
+			Name:   name,
+			Author: author,
+			Pages:  pages,
+		}
+		return obj, nil
+	default:
+		return Book{}, errors.New("something went wrong")
+	}
 }
 
 // Add a single book object to the database
