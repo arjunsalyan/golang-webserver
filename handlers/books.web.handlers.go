@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"learning_project/postgres"
+	"learning_project/redis"
 	"learning_project/templates"
 	"net/http"
 	"strconv"
@@ -22,10 +23,11 @@ func BooksViewHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			templates.BasicHTTPRender(w, "Pages must be a valid integer.")
 		}
-		bookObj := postgres.Book{
+		bookObj := postgres.Book{redis.RedisBook{
 			Name:   name,
 			Author: author,
 			Pages:  pages,
+		},
 		}
 
 		ok := postgres.Insert(bookObj)

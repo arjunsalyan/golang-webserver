@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"learning_project/redis"
+	"log"
+	"strconv"
 )
 
 // Book declares the schema for the table "books"
 type Book struct {
-	ID     int    `json:"id"`
-	Name   string `json:"name"`
-	Author string `json:"author"`
-	Pages  int    `json:"pages"`
+	redis.RedisBook
 }
 
 // GetAllBooks fetches all rows from the "books" table and returns a
@@ -24,7 +24,7 @@ func GetAllBooks() ([]Book, error) {
 		fmt.Println(err.Error())
 		return []Book{}, err
 	}
-	books := []Book{}
+	var books []Book
 	bookObj := Book{}
 
 	for rows.Next() {
@@ -54,6 +54,16 @@ func GetOneBook(id int) (Book, error) {
 		author string
 		pages  int
 	)
+	// First check in redis
+	val, err := redis.GetBookCache("book_" + strconv.Itoa(id))
+	book := Book{val}
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		return book, nil
+	}
+
+	// If nothing is found in cache then, get from the database
 	sqlStatement := `SELECT * FROM books WHERE id=$1`
 	db := openDBConnection()
 	row := db.QueryRow(sqlStatement, id)
@@ -61,13 +71,17 @@ func GetOneBook(id int) (Book, error) {
 	case sql.ErrNoRows:
 		return Book{}, errors.New("book does not exist")
 	case nil:
-		obj := Book{
-			ID:     id,
-			Name:   name,
-			Author: author,
-			Pages:  pages,
+		book.ID = id
+		book.Name = name
+		book.Author = author
+		book.Pages = pages
+
+		// Since the book was not found in the cache, so set it
+		err = book.SetBookCache("book_" + strconv.Itoa(id))
+		if err != nil {
+			log.Println(err.Error())
 		}
-		return obj, nil
+		return book, nil
 	default:
 		return Book{}, errors.New("something went wrong")
 	}
