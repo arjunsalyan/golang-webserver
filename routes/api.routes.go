@@ -7,6 +7,7 @@ import (
 )
 
 func APIRoutes(r *mux.Router) *mux.Router {
+	r.HandleFunc("/login", handlers.Login).Methods("POST")
 	r.HandleFunc("/book/get/{id}", handlers.GetBook)
 	r.HandleFunc("/books/get", handlers.GetBooks)
 	return r

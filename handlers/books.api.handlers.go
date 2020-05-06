@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"learning_project/auth"
 	"learning_project/postgres"
 	"net/http"
 	"strconv"
@@ -14,6 +15,16 @@ type ResponseError struct {
 }
 
 func GetBook(w http.ResponseWriter, r *http.Request) {
+	tokenAuth, err := auth.ExtractTokenMetadata(r)
+	if err != nil {
+		json.NewEncoder(w).Encode(ResponseError{http.StatusUnauthorized, "unauthorized"})
+		return
+	}
+	_, err = auth.FetchAuth(tokenAuth)
+	if err != nil {
+		json.NewEncoder(w).Encode(ResponseError{http.StatusUnauthorized, "unauthorized"})
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	idStr := params["id"]
